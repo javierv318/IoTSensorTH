@@ -1,5 +1,7 @@
 CREATE SCHEMA `parcial3` ;
 
+USE `parcial3`;
+
 CREATE TABLE `parcial3`.`datos_criadero` (
   `timestamp` INT(12) NOT NULL,
   `sensorId` INT(2) NOT NULL,
