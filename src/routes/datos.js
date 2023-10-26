@@ -6,13 +6,13 @@ const connection = mysql.createPool({
     connectionLimit: 500,
     host: 'localhost',
     user: 'root',
-    password: 'root', //el password de ingreso a mysql
+    password: 'root', 
     database: 'parcial3',
     port: 3306
 });
-connection.on('error', function(err) {
-    console.log("[mysql error]",err);
-  });
+connection.on('error', function (err) {
+    console.log("[mysql error]", err);
+});
 //function get en la ruta /datos, que trae todos los datos almacenados en la tabla
 router.get('/datos', (req, res) => {
     var json1 = {}; //variable para almacenar cada registro que se lea, en formato json
@@ -33,13 +33,12 @@ router.get('/datos', (req, res) => {
                     for (i = 0; i < resultado.length; i++) { //se lee el resultado y se arma el json
                         json1 = {
                             "timestamp": resultado[i].timestamp,
-                            "sensorId": resultado[i].sensorId, 
+                            "sensorId": resultado[i].sensorId,
                             "temperature": resultado[i].temperature,
                             "humidity": resultado[i].humidity,
-                            "thermalSensation":resultado[i].thermalSensation,
-                            "criadero":resultado[i].criadero
+                            "thermalSensation": resultado[i].thermalSensation,
+                            "criadero": resultado[i].criadero
                         };
-                        console.log(json1); //se muestra el json en la consola
                         arreglo.push(json1); //se añade el json al arreglo
                     }
                     res.json(arreglo); //se retorna el arreglo
@@ -54,10 +53,11 @@ router.post('/datos', (req, res) => {
     json1 = req.body; //se almacena el json recibido en la variable json1
     connection.getConnection(function (error, tempConn) { //conexion a mysql
         if (error) {
-            throw error; //en caso de error en la conexion
+            throw error;
         }
         else {
             console.log('Conexion correcta.');
+            //Lógica para la asignación de valor de la variable calculable
             var temp = json1.temperature;
             var hum = json1.humidity;
             var criadero = 0;
