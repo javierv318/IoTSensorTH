@@ -68,7 +68,7 @@ router.post('/datos', (req, res) => {
                 [json1.timestamp, json1.sensorId, json1.temperature, json1.humidity, json1.thermalSensation, criadero], function
                 (error, result) { //se ejecuta la inserción
                 if (error) {
-                    res.send("error al ejecutar el query");
+                    res.send(error);
                 } else {
                     tempConn.release();
                     res.send("datos almacenados"); //mensaje de respuesta
