@@ -47,6 +47,37 @@ router.get('/datos', (req, res) => {
         }
     });
 });
+//Metodo GET para retornar SOLO UN VALOR
+router.get('/datos/:pk', (req, res) => {
+    var buscado = req.params.pk;
+    var json1 = {}; //variable para almacenar el registro que se lea, en formato json
+    connection.getConnection(function (error, tempConn) { //conexion a mysql
+        if (error) {
+            throw error; //si no se pudo conectar
+        }
+        else {
+            console.log('Conexion correcta.');
+            //ejecución de la consulta
+            tempConn.query('SELECT * FROM datos_criadero WHERE timestamp = ?', [buscado], function (error, result) {
+                var resultado = result; //se almacena el resultado de la consulta en la variable resultado
+                if (error) {
+                    throw error;
+                } else {
+                    tempConn.release(); //se librea la conexión
+                    json1 = {
+                        "timestamp": resultado[0].timestamp,
+                        "sensorId": resultado[0].sensorId,
+                        "temperature": resultado[0].temperature,
+                        "humidity": resultado[0].humidity,
+                        "thermalSensation": resultado[0].thermalSensation,
+                        "criadero": resultado[0].criadero
+                    }
+                    res.json(json1); //se retorna el arreglo
+                }
+            });
+        }
+    });
+});
 //función post en la ruta /datos que recibe datos
 router.post('/datos', (req, res) => {
     console.log(req.body); //mustra en consola el json que llego
