@@ -32,6 +32,7 @@ router.get('/datos', (req, res) => {
                     tempConn.release(); //se librea la conexión
                     for (i = 0; i < resultado.length; i++) { //se lee el resultado y se arma el json
                         json1 = {
+                            "id":result[i].id,
                             "timestamp": resultado[i].timestamp,
                             "sensorId": resultado[i].sensorId,
                             "temperature": resultado[i].temperature,
@@ -47,10 +48,11 @@ router.get('/datos', (req, res) => {
         }
     });
 });
-//Metodo GET para retornar SOLO UN VALOR
-router.get('/datos/:pk', (req, res) => {
-    var buscado = req.params.pk;
-    var json1 = {}; //variable para almacenar el registro que se lea, en formato json
+//function GET que retorna los datos de un nodo
+router.get('/datos/:nodo', (req, res) => {
+    var nodo = req.params.nodo;
+    var json1 = {}; //variable para almacenar cada registro que se lea, en formato json
+    var arreglo = []; //variable para almacenar todos los datos, en formato arreglo de json
     connection.getConnection(function (error, tempConn) { //conexion a mysql
         if (error) {
             throw error; //si no se pudo conectar
@@ -58,21 +60,63 @@ router.get('/datos/:pk', (req, res) => {
         else {
             console.log('Conexion correcta.');
             //ejecución de la consulta
-            tempConn.query('SELECT * FROM datos_criadero WHERE timestamp = ?', [buscado], function (error, result) {
+            tempConn.query('SELECT * FROM datos_criadero WHERE sensorId = ?',[nodo], function (error, result) {
                 var resultado = result; //se almacena el resultado de la consulta en la variable resultado
                 if (error) {
                     throw error;
                 } else {
                     tempConn.release(); //se librea la conexión
-                    json1 = {
-                        "timestamp": resultado[0].timestamp,
-                        "sensorId": resultado[0].sensorId,
-                        "temperature": resultado[0].temperature,
-                        "humidity": resultado[0].humidity,
-                        "thermalSensation": resultado[0].thermalSensation,
-                        "criadero": resultado[0].criadero
+                    for (i = 0; i < resultado.length; i++) { //se lee el resultado y se arma el json
+                        json1 = {
+                            "id":result[i].id,
+                            "timestamp": resultado[i].timestamp,
+                            "sensorId": resultado[i].sensorId,
+                            "temperature": resultado[i].temperature,
+                            "humidity": resultado[i].humidity,
+                            "thermalSensation": resultado[i].thermalSensation,
+                            "criadero": resultado[i].criadero
+                        };
+                        arreglo.push(json1); //se añade el json al arreglo
                     }
-                    res.json(json1); //se retorna el arreglo
+                    res.json(arreglo); //se retorna el arreglo
+                }
+            });
+        }
+    });
+});
+//Metodo GET para retornar VALORES ENTRE FECHAS DE TIEMPO
+router.get('/datos/:stDate/:enDate', (req, res) => {
+    var start = req.params.stDate;
+    var end = req.params.enDate;
+    var json1 = {}; 
+    var arreglo = [];
+    connection.getConnection(function (error, tempConn) { //conexion a mysql
+        if (error) {
+            throw error; //si no se pudo conectar
+        }
+        else {
+            console.log('Conexion correcta.');
+            //ejecución de la consulta
+
+            tempConn.query('SELECT * FROM datos_criadero WHERE timestamp BETWEEN ? AND ?', [start,end], function (error, result) {
+                var resultado = result; //se almacena el resultado de la consulta en la variable resultado
+                if (error) {
+                    throw error;
+                } else {
+                    tempConn.release(); //se librea la conexión
+                    for (i = 0; i < resultado.length; i++) { //se lee el resultado y se arma el json
+                        json1 = {
+                            "id":resultado[i].id,
+                            "timestamp": resultado[i].timestamp,
+                            "sensorId": resultado[i].sensorId,
+                            "temperature": resultado[i].temperature,
+                            "humidity": resultado[i].humidity,
+                            "thermalSensation": resultado[i].thermalSensation,
+                            "criadero": resultado[i].criadero
+                        };
+                        arreglo.push(json1); //se añade el json al arreglo
+                    }
+                    res.json(arreglo);; //se retorna el arreglo
                 }
             });
         }
@@ -95,7 +139,7 @@ router.post('/datos', (req, res) => {
             if (30 >= temp && temp >= 25 && 85 >= hum && hum >= 75) {
                 criadero = 1;
             }
-            tempConn.query('INSERT INTO datos_criadero VALUES(?,?,?,?,?,?)',
+            tempConn.query('INSERT INTO datos_criadero VALUES(null,?,?,?,?,?,?)',
                 [json1.timestamp, json1.sensorId, json1.temperature, json1.humidity, json1.thermalSensation, criadero], function
                 (error, result) { //se ejecuta la inserción
                 if (error) {
