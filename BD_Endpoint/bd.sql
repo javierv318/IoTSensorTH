@@ -18,7 +18,7 @@ CREATE TABLE `parcial3`.`usuarios` (
   `usuario` VARCHAR(45) NOT NULL,
   `contraseña` VARCHAR(45) NOT NULL,
   `nombre` VARCHAR(45) NOT NULL,
-  `tipo` VARCHAR(45) NOT NULL,
+  `tipo` TINYINT(45) NOT NULL,
   `nodo` INT(5) NOT NULL,
   PRIMARY KEY (`id`)
-);
+); 

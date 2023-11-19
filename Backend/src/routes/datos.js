@@ -123,8 +123,7 @@ router.get('/datos/:stDate/:enDate', (req, res) => {
     });
 });
 //función post en la ruta /datos que recibe datos
-router.post('/datos', (req, res) => {
-    console.log(req.body); //mustra en consola el json que llego
+router.post('/datos', (req, res) => { 
     json1 = req.body; //se almacena el json recibido en la variable json1
     connection.getConnection(function (error, tempConn) { //conexion a mysql
         if (error) {
