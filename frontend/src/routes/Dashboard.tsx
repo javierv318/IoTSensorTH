@@ -1,18 +1,12 @@
-import '../routes/Dashboard.css'
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import {
-  Table,
-  Button,
-  Container,
-} from "reactstrap";
+import { Table, Button, Container } from "reactstrap";
 import { useAuth } from "../auth/AuthProvider";
 
-const auth = useAuth();
 
 var newData = new Array();
 function data() {
-  fetch("http://localhost:3000/datos/"+auth.user.nodo, {
+  fetch("http://localhost:3000/datos/", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -30,103 +24,85 @@ function data() {
 }
 data();
 
-  class App extends React.Component {
-    state = {
-      data:newData,
-      modalInsertar: false,
-      form: {
-        id: "",
-        timestamp:"",
-        sensorId: "",
-        temperature: "",
-        humidity: "",
-        thermalSensation: "",
-        criadero: ""
-      }
-    };
-    
-    actualizar() {
-      fetch("http://localhost:3000/datos", {
+export default function App() {
+  const auth = useAuth();
+  const [node, setNode] = useState(auth.user.nodo);
+  const [data, setData] = useState(newData);
+
+  useEffect(() => {
+    actualizar();
+  }, [node]);
+
+  const actualizar = async () => {
+    try {
+      const response = await fetch(`http://localhost:3000/datos/${node}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
-        }
-      })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`);
-          }
-          return response.json();
-        })
-        .then((data) => {
-          this.setState({
-            data: data,
-          });
-        })
-        .catch((error) => {
-          throw error;
-        });
-    }
-    
-    timestamp_to_iso_date(timestamp: any) {
-
-      var date = new Date(0);
-
-      date.setUTCSeconds(timestamp);
-
-      var dayComplete = (date.toISOString())
-      dayComplete = dayComplete.substring(0, 19);
-
-      return dayComplete;
-    };
-
-    handleChange = (e: { target: { name: any; value: any; }; }) => {
-      this.setState({
-        form: {
-          ...this.state.form,
-          [e.target.name]: e.target.value,
         },
       });
-    };
 
-    render() {
-      
-      return (
-        <>
-          <Container>
-            <br />
-            <Button color="success" onClick={()=>this.actualizar()}>Actualizar</Button>
-            <br />
-            <Table>
-              <thead>
-                <tr>
-                  <th>Id</th>
-                  <th>Fecha y hora</th>
-                  <th>Nodo</th>
-                  <th>Temperatura</th>
-                  <th>Humedad</th>
-                  <th>Sensación termica</th>
-                  <th>¿Criadero?</th>
-                </tr>
-              </thead>
-              <tbody>
-                {this.state.data.reverse().map((dato) => (
-                  <tr key={dato.id}>
-                    <td>{dato.id}</td>
-                    <td>{this.timestamp_to_iso_date(dato.fechahora)}</td>
-                    <td>{dato.sensorId}</td>
-                    <td>{dato.temperature}</td>
-                    <td>{dato.humidity}</td>
-                    <td>{dato.thermalSensation}</td>
-                    <td>{dato.criadero}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </Table>
-            <br />
-          </Container>
-        </>
-      );
+      if (!response.ok) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      const fetchedData = await response.json();
+      setData(fetchedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
+  };
+
+
+  const timestamp_to_iso_date = (timestamp: any) => {
+    if (!timestamp || isNaN(timestamp)) {
+      return "Invalid Timestamp";
+    }
+  
+    const date = new Date(0);
+    date.setUTCSeconds(timestamp);
+  
+    const dayComplete = date.toISOString().substring(0, 19);
+  
+    return dayComplete;
   }
-  export default App;
+
+  return (
+    <>
+      <Container>
+        <br />
+        <Button color="success" onClick={() => actualizar()}>
+          Actualizar
+        </Button>
+        <br />
+        <Table>
+          <thead>
+            <tr>
+              <th>Id</th>
+              <th>Fecha y hora</th>
+              <th>Nodo</th>
+              <th>Temperatura</th>
+              <th>Humedad</th>
+              <th>Sensación termica</th>
+              <th>¿Criadero?</th>
+            </tr>
+          </thead>
+          <tbody>
+            {data.reverse().map((dato) => (
+              <tr key={dato.id}>
+                <td>{dato.id}</td>
+                <td>{timestamp_to_iso_date(dato.fechahora)}</td>
+                <td>{dato.sensorId}</td>
+                <td>{dato.temperature}</td>
+                <td>{dato.humidity}</td>
+                <td>{dato.thermalSensation}</td>
+                <td>{dato.criadero}</td>
+              </tr>
+            ))}
+          </tbody>
+        </Table>
+        <br />
+      </Container>
+    </>
+  );
+}

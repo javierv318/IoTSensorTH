@@ -1,4 +1,4 @@
-import { useContext, createContext, useState, ReactNode } from "react";
+import React, { createContext, useContext, useState, ReactNode } from 'react';
 
 interface AuthContextProps {
   user: any | null;
@@ -10,7 +10,7 @@ interface AuthContextProps {
 const defaultAuthContextValues: AuthContextProps = {
   user: null,
   isAuthenticated: false,
-  login: (userData) => {},
+  login: () => {},
   logout: () => {},
 };
 
@@ -34,11 +34,24 @@ export function AuthProvider({ children }: AuthProviderProps) {
     setIsAuthenticated(false);
   };
 
+  const authContextValues: AuthContextProps = {
+    user,
+    isAuthenticated,
+    login,
+    logout,
+  };
+
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+    <AuthContext.Provider value={authContextValues}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => useContext(AuthContext);
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};

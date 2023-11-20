@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthProvider";
+import "../index.css"
 
 export default function Login() {
   const [user, setUser] = useState("");
@@ -17,7 +18,7 @@ export default function Login() {
       },
     })
     .then((res) => {
-      if (res.status === 250 || res.status === 251) {
+      if (res.status === 200) {
         return res.json(); 
       }
       if (!res.ok) {
@@ -28,7 +29,7 @@ export default function Login() {
     .then((userData) => {
       if (userData) {
         auth.login(userData);
-        navigate(userData.tipo === 1 ? "/Dashboard" : "/Dashboard2");
+        navigate(userData.tipo === 1 ? "/Dashboard2" : "/Dashboard");
       }
     })
     .catch((error) => {
@@ -50,10 +51,9 @@ export default function Login() {
           <input type="text" placeholder="Username" value={user} onChange={(e) => setUser(e.target.value)} name="username" required />
 
           <label>Password</label>
-          <input type="password" placeholder="Password" value={pass} onChange={(e) => setPassword(e.target.value)} name="password" />
-
-        </form>
-        <button onClick={() => login()}>Log In</button>
+          <input type="password" placeholder="Password" value={pass} onChange={(e) => setPassword(e.target.value)} name="password" />  
+        </form> 
+        <button onClick={() => login()}>Log In</button>          
       </main>
     </>
   );
