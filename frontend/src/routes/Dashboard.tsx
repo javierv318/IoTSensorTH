@@ -6,7 +6,7 @@ import { useAuth } from "../auth/AuthProvider";
 
 var newData = new Array();
 function data() {
-  fetch("http://localhost:3000/datos/", {
+  fetch("http://20.84.65.85:3000/datos/", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -19,7 +19,7 @@ function data() {
     return response.json();
   })
   .then((data) => {
-    newData=data;
+    newData=data.reverse();
   })
 }
 data();
@@ -35,7 +35,7 @@ export default function App() {
 
   const actualizar = async () => {
     try {
-      const response = await fetch(`http://localhost:3000/datos/${node}`, {
+      const response = await fetch(`http://20.84.65.85:3000/datos/${node}`, {
         method: "GET",
         headers: {
           "Content-Type": "application/json",
@@ -47,14 +47,14 @@ export default function App() {
       }
 
       const fetchedData = await response.json();
-      setData(fetchedData);
+      setData(fetchedData.reverse());
     } catch (error) {
       console.error("Error fetching data:", error);
     }
   };
 
 
-  const timestamp_to_iso_date = (timestamp: any) => {
+  const timestamp_to_iso_date = (timestamp: number) => {
     if (!timestamp || isNaN(timestamp)) {
       return "Invalid Timestamp";
     }
@@ -88,10 +88,10 @@ export default function App() {
             </tr>
           </thead>
           <tbody>
-            {data.reverse().map((dato) => (
+            {data.map((dato) => (
               <tr key={dato.id}>
                 <td>{dato.id}</td>
-                <td>{timestamp_to_iso_date(dato.fechahora)}</td>
+                <td>{timestamp_to_iso_date(dato.timestamp)}</td>
                 <td>{dato.sensorId}</td>
                 <td>{dato.temperature}</td>
                 <td>{dato.humidity}</td>

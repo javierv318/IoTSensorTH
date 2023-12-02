@@ -5,7 +5,7 @@ import { Table, Button, Container } from "reactstrap";
 
 var newData = new Array();
 function data() {
-  fetch("http://localhost:3000/datos/", {
+  fetch("http://20.84.65.85:3000/datos/", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -18,16 +18,16 @@ function data() {
     return response.json();
   })
   .then((data) => {
-    newData=data;
+    newData=data.reverse();
   })
 }
 data();
 
 export default function App() {
-  const [data, setData] = useState(newData);
+  var [data, setData] = useState(newData);
 
   const actualizar = () => {
-    fetch("http://localhost:3000/datos", {
+    fetch("http://20.84.65.85:3000/datos", {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -40,7 +40,7 @@ export default function App() {
         return response.json();
       })
       .then((data) => {
-        setData(data);
+        setData(data.reverse());
       })
       .catch((error) => {
         console.error("Error fetching data:", error);
@@ -81,10 +81,10 @@ export default function App() {
             </tr>
           </thead>
           <tbody>
-            {data.reverse().map((dato) => (
+            {data.map((dato) => (
               <tr key={dato.id}>
                 <td>{dato.id}</td>
-                <td>{timestamp_to_iso_date(dato.fechahora)}</td>
+                <td>{timestamp_to_iso_date(dato.timestamp)}</td>
                 <td>{dato.sensorId}</td>
                 <td>{dato.temperature}</td>
                 <td>{dato.humidity}</td>

@@ -10,7 +10,7 @@ export default function Login() {
   const navigate = useNavigate();
 
   const login = () => {
-    var string = "http://localhost:3000/usuarios/"+user+"/"+pass;
+    var string = "http://20.84.65.85:3000/usuarios/"+user+"/"+pass;
     fetch(string, {
       method: "GET",
       headers: {
